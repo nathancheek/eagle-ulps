@@ -19,10 +19,7 @@ string script_name = "";
 string header = "";
 string command_header = "";
 string script = "";
-string split_commands = "";
 string footer = "";
-int splitCounter = 0;
-int splitSize = 0;
 int countLines = 0;
 int numLines = 0;
 
@@ -47,13 +44,8 @@ void generate_line_command(int x1, int y1, int x2, int y2) {
     if (countLines) { // In line-counting mode, so increment numLines then return
         numLines++;
         return;
-    }
-    if (splitCounter == splitSize) { // Not in line-counting mode, so generate script
-        split_commands += c;
-        splitCounter = 0;
-    } else {
+    } else { // Not in line-counting mode, so generate script
         script += c;
-        splitCounter++;
     }
 }
 
@@ -220,24 +212,10 @@ void main(void) {
 
     // Generate and run script
     if (board) board(B) {
-        // Joining lines seems to be a O(n^2) problem where each time another line is joined, all other connected lines get checked.
-        // For designs with thousands of connected lines, this causes the script to slow down immensely as the number of connected lines grows,
-        // think a problem of size 1 + 2 + 3 + ... + n, which is the same as n(n+1)/2 -> O(n^2).
-        // The most optimal way to solve this is through a divide-and-conquer algorithm which would give us O(nlogn) complexity.
-        // Unfortunately, this program isn't designed in a way that it could use a divide-and-conquer algorithm.
-        // An easier way of reducing the script runtime is to split the outline into sqrt(n) smaller connected sections, then stitch them together
-        // at the end of the script. Unfortunately, the way this program is designed it can't see the big picture of which lines are connected to others.
-        // Therefore, there isn't a great way to ensure sqrt(n)-line sections, but depending on the shape of the bitmap, we can approximate.
-        // This script approximates sqrt(n)-line sections by skipping one line every sqrt(n) lines, placing those lines at the end of the script.
-
         // Calculate number of lines
         countLines = 1; // Enable line-counting mode
         find_lines(B);
         countLines = 0; // Disable line-counting mode
-        splitSize = int(sqrt(numLines));
-        string h = "";
-        sprintf(h, "# drawing split every %d lines during main pass to speed up script\n\n", splitSize);
-        header += h;
 
         // Quit if no lines detected
         if (!numLines) {
@@ -253,7 +231,6 @@ void main(void) {
             printf(header);
             printf(command_header);
             printf(script);
-            printf(split_commands);
             printf(footer);
         }
 
