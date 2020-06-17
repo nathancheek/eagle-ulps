@@ -2,7 +2,7 @@
        "<p>"
        "See Help of the ULP for further instructions."
        "<p>"
-       "<author>Author: support@cadsoft.de (based on original code from Michel Dagenais, jcmae@sympatico.ca)</author>"
+       "<author>Author: support@cadsoft.de (based on original code from Michel Dagenais, jcmae@sympatico.ca), element-counting bugfix by Nathan Cheek (ncheek@gatech.edu)</author>"
 
 // THIS PROGRAM IS PROVIDED AS IS AND WITHOUT WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED
 
@@ -290,8 +290,8 @@ board(B) { // Get board size to determine ratio.
              last_prefix = prefix_top[i_p_top];
              if (number_prefix > largest_number_prefix) {
                 largest_number_prefix = number_prefix;               // update largest_n..
-                number_prefix = 1;
                 }
+             number_prefix = 1; // Reset counter since we're on a new prefix
              }
           old_suffix_top[i_p_top] = strtol(tmp_string) ;
           switch (c_top) {
